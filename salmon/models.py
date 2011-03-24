@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -10,6 +11,22 @@ class SubscriptionManager(models.Manager):
             content_type=content_type,
             object_id=obj.id,
             salmon_endpoint=endpoint)
+
+    def unsubscribe(self, obj):
+        subscription = self.get_for_object(obj)
+        if subscription:
+            subscription.delete()
+
+    def get_for_object(self, obj):
+        content_type = ContentType.objects.get_for_model(obj)
+        print content_type
+        print obj.id
+        try:
+            sub = Subscription.objects.get(
+                content_type=content_type, object_id=obj.id)
+            return sub
+        except Subscription.DoesNotExist:
+            return None
 
 
 class Subscription(models.Model):
@@ -28,3 +45,4 @@ class Subscription(models.Model):
     def get_object(self):
         cls = self.content_type.model_class()
         return cls.objects.get(id=self.object_id)
+admin.site.register(Subscription)
