@@ -6,4 +6,5 @@ from django.views.decorators.http import require_POST
 @csrf_exempt
 @require_POST
 def endpoint(request):
-    return HttpResponse('slapped')
+    print 'slapped: %s' % (request.raw_post_data,)
+    return HttpResponse('slapped: %s' % (request.raw_post_data,))
